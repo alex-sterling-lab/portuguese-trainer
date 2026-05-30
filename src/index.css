@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply font-sans text-ink-800 antialiased;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #e7f3ec 0%, transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, #eef2fb 0%, transparent 55%),
+      #fdfcf9;
+    min-height: 100vh;
+  }
+  ::selection {
+    background: #bbe2c8;
+    color: #1a3d2d;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-soft border border-ink-100/70;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition
+           focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-soft;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-ink-800 border border-ink-200 hover:border-ink-300 hover:bg-ink-50;
+  }
+  .btn-ghost {
+    @apply btn text-ink-700 hover:bg-ink-100;
+  }
+  .btn-danger {
+    @apply btn bg-white text-red-600 border border-red-200 hover:bg-red-50;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-100;
+  }
+  .chip-muted {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ink-100 text-ink-700;
+  }
+  .input {
+    @apply w-full bg-white rounded-xl border border-ink-200 px-4 py-2.5 text-base
+           focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15
+           placeholder:text-ink-400;
+  }
+  .label {
+    @apply text-xs font-semibold uppercase tracking-wide text-ink-500;
+  }
+  .h1 { @apply text-2xl sm:text-3xl font-semibold text-ink-900 tracking-tight; }
+  .h2 { @apply text-xl sm:text-2xl font-semibold text-ink-900 tracking-tight; }
+  .h3 { @apply text-lg font-semibold text-ink-900; }
+  .muted { @apply text-ink-500; }
+  .link { @apply text-brand-700 hover:text-brand-800 underline-offset-2 hover:underline; }
+}
+
+.flip-scene {
+  perspective: 1200px;
+}
+.flip-card {
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(.2,.8,.2,1);
+}
+.flip-card.is-flipped {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
