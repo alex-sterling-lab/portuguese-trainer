@@ -1,6 +1,7 @@
-// Present-tense (presente do indicativo) conjugations for 20 essential beginner verbs.
-// Persons used by the trainer: eu, você, ele, ela, nós, vocês, eles, elas.
-// (Brazilian default — 'tu' is not part of the main practice set.)
+// Present-tense (presente do indicativo) conjugations for essential beginner verbs.
+// Persons used by the trainer: eu, você, a gente, ele, ela, nós, vocês, eles, elas.
+// (Brazilian default — 'tu' is not part of the main practice set. 'a gente' = "we" (informal),
+// takes the 3rd-person-singular form: 'a gente é', 'a gente tem', 'a gente fala'.)
 
 const verbs = [
   {
@@ -9,9 +10,11 @@ const verbs = [
     english: "to be (permanent)",
     irregular: true,
     forms: {
-      eu: "sou", você: "é", ele: "é", ela: "é",
+      eu: "sou", você: "é", "a gente": "é", ele: "é", ela: "é",
       nós: "somos", vocês: "são", eles: "são", elas: "são",
     },
+    formsEnglish: { eu: "I am", você: "you are", "a gente": "we are", nós: "we are" },
+    intro: "ser = to be. Use sou with eu: eu sou estudante.",
     note: "Use 'ser' for identity and permanent traits: 'Eu sou brasileiro.'",
   },
   {
@@ -20,9 +23,11 @@ const verbs = [
     english: "to be (state / location)",
     irregular: true,
     forms: {
-      eu: "estou", você: "está", ele: "está", ela: "está",
+      eu: "estou", você: "está", "a gente": "está", ele: "está", ela: "está",
       nós: "estamos", vocês: "estão", eles: "estão", elas: "estão",
     },
+    formsEnglish: { eu: "I am", você: "you are", "a gente": "we are", nós: "we are" },
+    intro: "estar = to be. Use estou with eu: eu estou em casa.",
     note: "Use 'estar' for temporary states and location: 'Eu estou cansado.'",
   },
   {
@@ -31,9 +36,11 @@ const verbs = [
     english: "to have",
     irregular: true,
     forms: {
-      eu: "tenho", você: "tem", ele: "tem", ela: "tem",
+      eu: "tenho", você: "tem", "a gente": "tem", ele: "tem", ela: "tem",
       nós: "temos", vocês: "têm", eles: "têm", elas: "têm",
     },
+    formsEnglish: { eu: "I have", você: "you have", "a gente": "we have", nós: "we have" },
+    intro: "ter = to have. Use tenho with eu: eu tenho café.",
     note: "Plural 'têm' has a circumflex to distinguish from singular 'tem'.",
   },
   {
@@ -42,9 +49,11 @@ const verbs = [
     english: "to go",
     irregular: true,
     forms: {
-      eu: "vou", você: "vai", ele: "vai", ela: "vai",
+      eu: "vou", você: "vai", "a gente": "vai", ele: "vai", ela: "vai",
       nós: "vamos", vocês: "vão", eles: "vão", elas: "vão",
     },
+    formsEnglish: { eu: "I go", você: "you go", "a gente": "we go", nós: "we go" },
+    intro: "ir = to go. Use vou with eu: eu vou para casa.",
     note: "Often used as a future: 'Eu vou estudar' = I'm going to study.",
   },
   {
@@ -53,9 +62,11 @@ const verbs = [
     english: "to do / to make",
     irregular: true,
     forms: {
-      eu: "faço", você: "faz", ele: "faz", ela: "faz",
+      eu: "faço", você: "faz", "a gente": "faz", ele: "faz", ela: "faz",
       nós: "fazemos", vocês: "fazem", eles: "fazem", elas: "fazem",
     },
+    formsEnglish: { eu: "I do", você: "you do", "a gente": "we do", nós: "we do" },
+    intro: "fazer = to do / make. Use faço with eu: eu faço o jantar.",
     note: "'eu faço' uses ç before o to keep the soft sound.",
   },
   {
@@ -64,9 +75,11 @@ const verbs = [
     english: "to speak / to talk",
     irregular: false,
     forms: {
-      eu: "falo", você: "fala", ele: "fala", ela: "fala",
+      eu: "falo", você: "fala", "a gente": "fala", ele: "fala", ela: "fala",
       nós: "falamos", vocês: "falam", eles: "falam", elas: "falam",
     },
+    formsEnglish: { eu: "I speak", você: "you speak", "a gente": "we speak", nós: "we speak" },
+    intro: "falar = to speak. Use falo with eu: eu falo português.",
     note: "Regular -ar verb — a great pattern to memorize first.",
   },
   {
@@ -75,9 +88,11 @@ const verbs = [
     english: "to eat",
     irregular: false,
     forms: {
-      eu: "como", você: "come", ele: "come", ela: "come",
+      eu: "como", você: "come", "a gente": "come", ele: "come", ela: "come",
       nós: "comemos", vocês: "comem", eles: "comem", elas: "comem",
     },
+    formsEnglish: { eu: "I eat", você: "you eat", "a gente": "we eat", nós: "we eat" },
+    intro: "comer = to eat. Use como with eu: eu como pão.",
     note: "Model regular -er verb.",
   },
   {
@@ -86,10 +101,25 @@ const verbs = [
     english: "to drink",
     irregular: false,
     forms: {
-      eu: "bebo", você: "bebe", ele: "bebe", ela: "bebe",
+      eu: "bebo", você: "bebe", "a gente": "bebe", ele: "bebe", ela: "bebe",
       nós: "bebemos", vocês: "bebem", eles: "bebem", elas: "bebem",
     },
+    formsEnglish: { eu: "I drink", você: "you drink", "a gente": "we drink", nós: "we drink" },
+    intro: "beber = to drink. Use bebo with eu: eu bebo café.",
     note: "Same pattern as 'comer'.",
+  },
+  {
+    id: "aprender",
+    infinitive: "aprender",
+    english: "to learn",
+    irregular: false,
+    forms: {
+      eu: "aprendo", você: "aprende", "a gente": "aprende", ele: "aprende", ela: "aprende",
+      nós: "aprendemos", vocês: "aprendem", eles: "aprendem", elas: "aprendem",
+    },
+    formsEnglish: { eu: "I learn", você: "you learn", "a gente": "we learn", nós: "we learn" },
+    intro: "aprender = to learn. Use aprendo with eu: eu aprendo português.",
+    note: "Regular -er verb. Often followed by 'a + infinitive': 'aprender a falar'.",
   },
   {
     id: "querer",
@@ -97,9 +127,11 @@ const verbs = [
     english: "to want",
     irregular: true,
     forms: {
-      eu: "quero", você: "quer", ele: "quer", ela: "quer",
+      eu: "quero", você: "quer", "a gente": "quer", ele: "quer", ela: "quer",
       nós: "queremos", vocês: "querem", eles: "querem", elas: "querem",
     },
+    formsEnglish: { eu: "I want", você: "you want", "a gente": "we want", nós: "we want" },
+    intro: "querer = to want. Use quero with eu: eu quero café.",
     note: "Notice 'você quer' has no -e ending in the singular.",
   },
   {
@@ -108,9 +140,11 @@ const verbs = [
     english: "can / to be able",
     irregular: true,
     forms: {
-      eu: "posso", você: "pode", ele: "pode", ela: "pode",
+      eu: "posso", você: "pode", "a gente": "pode", ele: "pode", ela: "pode",
       nós: "podemos", vocês: "podem", eles: "podem", elas: "podem",
     },
+    formsEnglish: { eu: "I can", você: "you can", "a gente": "we can", nós: "we can" },
+    intro: "poder = can. Use posso with eu: eu posso ajudar.",
     note: "'Eu posso' has a double s — pronounced like 'POH-soo'.",
   },
   {
@@ -119,9 +153,11 @@ const verbs = [
     english: "to like",
     irregular: false,
     forms: {
-      eu: "gosto", você: "gosta", ele: "gosta", ela: "gosta",
+      eu: "gosto", você: "gosta", "a gente": "gosta", ele: "gosta", ela: "gosta",
       nós: "gostamos", vocês: "gostam", eles: "gostam", elas: "gostam",
     },
+    formsEnglish: { eu: "I like", você: "you like", "a gente": "we like", nós: "we like" },
+    intro: "gostar = to like. Use gosto with eu: eu gosto de café.",
     note: "Almost always followed by 'de': 'Eu gosto de café.'",
   },
   {
@@ -130,9 +166,11 @@ const verbs = [
     english: "to live (somewhere)",
     irregular: false,
     forms: {
-      eu: "moro", você: "mora", ele: "mora", ela: "mora",
+      eu: "moro", você: "mora", "a gente": "mora", ele: "mora", ela: "mora",
       nós: "moramos", vocês: "moram", eles: "moram", elas: "moram",
     },
+    formsEnglish: { eu: "I live", você: "you live", "a gente": "we live", nós: "we live" },
+    intro: "morar = to live (somewhere). Use moro with eu: eu moro em Lisboa.",
     note: "Use 'morar em' for cities: 'Ela mora em Lisboa.'",
   },
   {
@@ -141,9 +179,11 @@ const verbs = [
     english: "to work",
     irregular: false,
     forms: {
-      eu: "trabalho", você: "trabalha", ele: "trabalha", ela: "trabalha",
+      eu: "trabalho", você: "trabalha", "a gente": "trabalha", ele: "trabalha", ela: "trabalha",
       nós: "trabalhamos", vocês: "trabalham", eles: "trabalham", elas: "trabalham",
     },
+    formsEnglish: { eu: "I work", você: "you work", "a gente": "we work", nós: "we work" },
+    intro: "trabalhar = to work. Use trabalho with eu: eu trabalho em casa.",
     note: "Regular -ar verb.",
   },
   {
@@ -152,9 +192,11 @@ const verbs = [
     english: "to study",
     irregular: false,
     forms: {
-      eu: "estudo", você: "estuda", ele: "estuda", ela: "estuda",
+      eu: "estudo", você: "estuda", "a gente": "estuda", ele: "estuda", ela: "estuda",
       nós: "estudamos", vocês: "estudam", eles: "estudam", elas: "estudam",
     },
+    formsEnglish: { eu: "I study", você: "you study", "a gente": "we study", nós: "we study" },
+    intro: "estudar = to study. Use estudo with eu: eu estudo português.",
     note: "Regular -ar verb.",
   },
   {
@@ -163,9 +205,11 @@ const verbs = [
     english: "to see / to watch",
     irregular: true,
     forms: {
-      eu: "vejo", você: "vê", ele: "vê", ela: "vê",
+      eu: "vejo", você: "vê", "a gente": "vê", ele: "vê", ela: "vê",
       nós: "vemos", vocês: "veem", eles: "veem", elas: "veem",
     },
+    formsEnglish: { eu: "I see", você: "you see", "a gente": "we see", nós: "we see" },
+    intro: "ver = to see / watch. Use vejo with eu: eu vejo um filme.",
     note: "Watch the accent: 'ele vê'. Plural 'veem' has two e's.",
   },
   {
@@ -174,9 +218,11 @@ const verbs = [
     english: "to give",
     irregular: true,
     forms: {
-      eu: "dou", você: "dá", ele: "dá", ela: "dá",
+      eu: "dou", você: "dá", "a gente": "dá", ele: "dá", ela: "dá",
       nós: "damos", vocês: "dão", eles: "dão", elas: "dão",
     },
+    formsEnglish: { eu: "I give", você: "you give", "a gente": "we give", nós: "we give" },
+    intro: "dar = to give. Use dou with eu: eu dou um presente.",
     note: "Short verb, irregular: 'eu dou', 'ele dá'.",
   },
   {
@@ -185,9 +231,11 @@ const verbs = [
     english: "to know (a fact)",
     irregular: true,
     forms: {
-      eu: "sei", você: "sabe", ele: "sabe", ela: "sabe",
+      eu: "sei", você: "sabe", "a gente": "sabe", ele: "sabe", ela: "sabe",
       nós: "sabemos", vocês: "sabem", eles: "sabem", elas: "sabem",
     },
+    formsEnglish: { eu: "I know", você: "you know", "a gente": "we know", nós: "we know" },
+    intro: "saber = to know (a fact). Use sei with eu: eu sei a resposta.",
     note: "Use 'saber' for facts; 'conhecer' for people/places.",
   },
   {
@@ -196,9 +244,11 @@ const verbs = [
     english: "to stay / to become / to be located",
     irregular: false,
     forms: {
-      eu: "fico", você: "fica", ele: "fica", ela: "fica",
+      eu: "fico", você: "fica", "a gente": "fica", ele: "fica", ela: "fica",
       nós: "ficamos", vocês: "ficam", eles: "ficam", elas: "ficam",
     },
+    formsEnglish: { eu: "I stay", você: "you stay", "a gente": "we stay", nós: "we stay" },
+    intro: "ficar = to stay. Use fico with eu: eu fico em casa.",
     note: "Also used for location: 'O hotel fica perto da praia.'",
   },
   {
@@ -207,9 +257,11 @@ const verbs = [
     english: "to buy",
     irregular: false,
     forms: {
-      eu: "compro", você: "compra", ele: "compra", ela: "compra",
+      eu: "compro", você: "compra", "a gente": "compra", ele: "compra", ela: "compra",
       nós: "compramos", vocês: "compram", eles: "compram", elas: "compram",
     },
+    formsEnglish: { eu: "I buy", você: "you buy", "a gente": "we buy", nós: "we buy" },
+    intro: "comprar = to buy. Use compro with eu: eu compro pão.",
     note: "Regular -ar verb.",
   },
   {
@@ -218,16 +270,54 @@ const verbs = [
     english: "to need",
     irregular: false,
     forms: {
-      eu: "preciso", você: "precisa", ele: "precisa", ela: "precisa",
+      eu: "preciso", você: "precisa", "a gente": "precisa", ele: "precisa", ela: "precisa",
       nós: "precisamos", vocês: "precisam", eles: "precisam", elas: "precisam",
     },
+    formsEnglish: { eu: "I need", você: "you need", "a gente": "we need", nós: "we need" },
+    intro: "precisar = to need. Use preciso with eu: eu preciso de ajuda.",
     note: "Followed by 'de' before a noun: 'Preciso de ajuda.'",
   },
 ];
 
 // Practice prompts. Each prompt asks: given the sentence with a blank,
 // the verb infinitive, and the person, type the correct conjugated form.
+// Some prompts carry a `tag` used by Lesson 2 (negation / questions).
 export const practicePrompts = [
+  // ----- Lesson 1 (ser / estar / ter — eu / você / a gente) -----
+  { id: 100, sentence: "Eu ___ Hanna.", verb: "ser", person: "eu", answer: "sou",
+    translation: "I am Hanna." },
+  { id: 101, sentence: "Eu ___ em casa.", verb: "estar", person: "eu", answer: "estou",
+    translation: "I am at home." },
+  { id: 102, sentence: "Eu ___ café.", verb: "ter", person: "eu", answer: "tenho",
+    translation: "I have coffee." },
+  { id: 103, sentence: "Você ___ legal.", verb: "ser", person: "você", answer: "é",
+    translation: "You are nice." },
+  { id: 104, sentence: "Você ___ tempo?", verb: "ter", person: "você", answer: "tem",
+    translation: "Do you have time?" },
+  { id: 105, sentence: "A gente ___ bem.", verb: "estar", person: "a gente", answer: "está",
+    translation: "We are fine." },
+  { id: 106, sentence: "A gente ___ tempo.", verb: "ter", person: "a gente", answer: "tem",
+    translation: "We have time." },
+  { id: 107, sentence: "Eu ___ estudante.", verb: "ser", person: "eu", answer: "sou",
+    translation: "I am a student." },
+  { id: 108, sentence: "A gente ___ amigos.", verb: "ser", person: "a gente", answer: "é",
+    translation: "We are friends." },
+
+  // ----- Lesson 2 (negation + questions) -----
+  { id: 110, tag: "lesson2", sentence: "Eu não ___ em casa.", verb: "estar", person: "eu", answer: "estou",
+    translation: "I am not at home." },
+  { id: 111, tag: "lesson2", sentence: "Eu não ___ café.", verb: "ter", person: "eu", answer: "tenho",
+    translation: "I don't have coffee." },
+  { id: 112, tag: "lesson2", sentence: "Você ___ bem?", verb: "estar", person: "você", answer: "está",
+    translation: "Are you well?" },
+  { id: 113, tag: "lesson2", sentence: "A gente não ___ tempo.", verb: "ter", person: "a gente", answer: "tem",
+    translation: "We don't have time." },
+  { id: 114, tag: "lesson2", sentence: "Você ___ estudante?", verb: "ser", person: "você", answer: "é",
+    translation: "Are you a student?" },
+  { id: 115, tag: "lesson2", sentence: "Eu não ___ legal hoje.", verb: "estar", person: "eu", answer: "estou",
+    translation: "I'm not feeling great today." },
+
+  // ----- Existing practice mix (lessons 3–5 covered by focusVerbs filter) -----
   { id: 1, sentence: "Eu ___ café.", verb: "beber", person: "eu", answer: "bebo",
     translation: "I drink coffee." },
   { id: 2, sentence: "Ela ___ em Lisboa.", verb: "morar", person: "ela", answer: "mora",
@@ -308,6 +398,14 @@ export const practicePrompts = [
     translation: "She buys a gift for her son." },
   { id: 40, sentence: "Nós ___ de ajuda agora.", verb: "precisar", person: "nós", answer: "precisamos",
     translation: "We need help now." },
+
+  // ----- A few more aprender prompts (lesson 4 cover) -----
+  { id: 130, sentence: "Eu ___ português.", verb: "aprender", person: "eu", answer: "aprendo",
+    translation: "I learn Portuguese." },
+  { id: 131, sentence: "A gente ___ rápido.", verb: "aprender", person: "a gente", answer: "aprende",
+    translation: "We learn quickly." },
+  { id: 132, sentence: "Você ___ inglês na escola?", verb: "aprender", person: "você", answer: "aprende",
+    translation: "Do you learn English at school?" },
 ];
 
 export default verbs;

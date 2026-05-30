@@ -7,11 +7,14 @@ import {
   getPracticedVerbs,
   recordVerbResult,
   addMistake,
+  getSettings,
 } from "../utils/storage.js";
+import { getLessonById, promptsForLesson } from "../data/lessons.js";
 
 const PERSON_LABELS = {
   eu: "eu (I)",
   você: "você (you)",
+  "a gente": "a gente (we, informal)",
   ele: "ele (he)",
   ela: "ela (she)",
   nós: "nós (we)",
@@ -22,8 +25,18 @@ const PERSON_LABELS = {
 
 export default function VerbTrainer() {
   const verbMap = useMemo(() => Object.fromEntries(verbs.map((v) => [v.id, v])), []);
+  const [settings] = useState(() => getSettings());
+  const lesson = getLessonById(settings.activeLesson);
+  const [onlyLesson, setOnlyLesson] = useState(true);
+
+  const activePool = useMemo(() => {
+    if (!onlyLesson) return practicePrompts;
+    const pool = promptsForLesson(practicePrompts, lesson);
+    return pool.length > 0 ? pool : practicePrompts;
+  }, [onlyLesson, lesson]);
+
   const [stats, setStats] = useState(() => getPracticedVerbs());
-  const [prompt, setPrompt] = useState(() => pickRandom(practicePrompts));
+  const [prompt, setPrompt] = useState(() => pickRandom(activePool));
   const [userAnswer, setUserAnswer] = useState("");
   const [feedback, setFeedback] = useState(null); // { ok, correct, explanation }
   const [showHint, setShowHint] = useState(false);
@@ -32,6 +45,17 @@ export default function VerbTrainer() {
   useEffect(() => {
     inputRef.current?.focus();
   }, [prompt]);
+
+  // When the user toggles the lesson filter, switch to a prompt from the new pool.
+  useEffect(() => {
+    if (!activePool.some((p) => p.id === prompt.id)) {
+      setPrompt(pickRandom(activePool));
+      setUserAnswer("");
+      setFeedback(null);
+      setShowHint(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePool]);
 
   const verb = verbMap[prompt.verb];
 
@@ -60,14 +84,14 @@ export default function VerbTrainer() {
   }
 
   function next() {
-    setPrompt(pickRandom(practicePrompts, [prompt.id]));
+    setPrompt(pickRandom(activePool, [prompt.id]));
     setUserAnswer("");
     setFeedback(null);
     setShowHint(false);
   }
 
   function skip() {
-    setPrompt(pickRandom(practicePrompts, [prompt.id]));
+    setPrompt(pickRandom(activePool, [prompt.id]));
     setUserAnswer("");
     setFeedback(null);
     setShowHint(false);
@@ -90,6 +114,19 @@ export default function VerbTrainer() {
           <span className="chip-muted">{accuracy}% accuracy</span>
         </div>
       </header>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        <label className="flex items-center gap-2 text-sm muted cursor-pointer">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500"
+            checked={onlyLesson}
+            onChange={(e) => setOnlyLesson(e.target.checked)}
+          />
+          Practice only current lesson · <span className="chip-muted">L{lesson.id}: {lesson.title}</span>
+        </label>
+        <span className="text-xs muted">{activePool.length} prompts in pool</span>
+      </div>
 
       <Card>
         <div className="flex items-center justify-between mb-3">
@@ -172,6 +209,11 @@ export default function VerbTrainer() {
 
       <Card>
         <h3 className="h3">Conjugation: {verb.infinitive} <span className="muted text-sm font-normal">— {verb.english}</span></h3>
+        {verb.intro ? (
+          <div className="mt-3 p-3 rounded-xl bg-brand-50/60 border border-brand-100 text-sm text-ink-800">
+            <span className="font-semibold">Beginner tip:</span> {verb.intro}
+          </div>
+        ) : null}
         <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
           {Object.entries(verb.forms).map(([person, form]) => (
             <div key={person} className="p-3 rounded-xl border border-ink-100 bg-sand-50">

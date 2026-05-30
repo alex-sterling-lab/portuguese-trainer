@@ -12,6 +12,7 @@ import {
   getBestScore,
   getSettings,
 } from "../utils/storage.js";
+import { getLessonById } from "../data/lessons.js";
 
 const DAILY_PLAN = [
   { to: "/words",      label: "Learn 10 new words",  hint: "Vocabulary" },
@@ -42,6 +43,7 @@ export default function Dashboard() {
   const totalWords = words.length;
   const totalVerbs = verbs.length;
   const learnedPct = Math.round((snap.learnedCount / totalWords) * 100);
+  const lesson = getLessonById(snap.settings.activeLesson);
 
   return (
     <div className="space-y-6">
@@ -53,6 +55,58 @@ export default function Dashboard() {
           Your daily goal is{" "}
           <span className="font-semibold text-ink-800">{snap.settings.dailyGoal} cards</span>.
         </p>
+      </section>
+
+      <section>
+        <Card className="!p-0 overflow-hidden">
+          <div className="grid lg:grid-cols-3">
+            <div className="lg:col-span-2 p-5 sm:p-6">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="chip">Lesson {lesson.id}</span>
+                <span className="chip-muted">Your current lesson</span>
+              </div>
+              <h2 className="h2 mt-2">{lesson.title}</h2>
+              <p className="muted mt-1">{lesson.summary}</p>
+
+              <div className="mt-4">
+                <div className="label">Focus verbs</div>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {lesson.focusVerbs.map((v) => (
+                    <span key={v} className="px-2.5 py-1 rounded-lg bg-brand-50 border border-brand-100 text-brand-800 font-mono text-sm">
+                      {v}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <div className="label">Example sentences</div>
+                <ul className="mt-2 space-y-1.5">
+                  {lesson.examples.map((e, i) => (
+                    <li key={i} className="text-ink-800">
+                      <span className="font-medium">{e.pt}</span>{" "}
+                      <span className="muted text-sm">— {e.en}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Link to="/verbs" className="btn-primary">Start lesson practice →</Link>
+                <Link to="/flashcards" className="btn-secondary">Lesson flashcards</Link>
+                <Link to="/settings" className="btn-ghost">Change lesson</Link>
+              </div>
+            </div>
+            <div className="hidden lg:block bg-gradient-to-br from-brand-50 to-sand-100 border-l border-ink-100 p-6">
+              <div className="text-xs uppercase tracking-wide text-brand-700/80 font-semibold">Tip</div>
+              <p className="mt-2 text-sm text-ink-700 leading-relaxed">
+                Stay on one lesson until the verb forms feel automatic.
+                Speed comes from <em>repetition</em>, not from new content.
+              </p>
+              <div className="mt-6 text-xs text-ink-500">{lesson.subtitle}</div>
+            </div>
+          </div>
+        </Card>
       </section>
 
       <section className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">

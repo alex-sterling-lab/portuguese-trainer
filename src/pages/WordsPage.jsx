@@ -7,6 +7,7 @@ import {
   toggleLearnedWord,
   getSettings,
 } from "../utils/storage.js";
+import { getLessonById, wordsForLesson } from "../data/lessons.js";
 
 export default function WordsPage() {
   const [learned, setLearned] = useState(() => getLearnedWords());
@@ -14,10 +15,17 @@ export default function WordsPage() {
   const [activeCat, setActiveCat] = useState("All");
   const [onlyUnlearned, setOnlyUnlearned] = useState(false);
   const [settings] = useState(() => getSettings());
+  const lesson = getLessonById(settings.activeLesson);
+  const [onlyLesson, setOnlyLesson] = useState(false);
+
+  const lessonWordSet = useMemo(() => {
+    return new Set(wordsForLesson(words, lesson).map((w) => w.id));
+  }, [lesson]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return words.filter((w) => {
+      if (onlyLesson && !lessonWordSet.has(w.id)) return false;
       if (activeCat !== "All" && w.category !== activeCat) return false;
       if (onlyUnlearned && learned.includes(w.id)) return false;
       if (!q) return true;
@@ -27,7 +35,7 @@ export default function WordsPage() {
         w.category.toLowerCase().includes(q)
       );
     });
-  }, [query, activeCat, onlyUnlearned, learned]);
+  }, [query, activeCat, onlyUnlearned, learned, onlyLesson, lessonWordSet]);
 
   function onToggle(id) {
     setLearned(toggleLearnedWord(id));
@@ -49,7 +57,16 @@ export default function WordsPage() {
             <span className="font-semibold text-ink-700">{learnedCount} learned</span>
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4 flex-wrap">
+          <label className="flex items-center gap-2 text-sm muted cursor-pointer">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500"
+              checked={onlyLesson}
+              onChange={(e) => setOnlyLesson(e.target.checked)}
+            />
+            Show only current lesson <span className="chip-muted">L{lesson.id}</span>
+          </label>
           <label className="flex items-center gap-2 text-sm muted cursor-pointer">
             <input
               type="checkbox"

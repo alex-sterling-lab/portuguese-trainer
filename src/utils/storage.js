@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS = {
   dailyGoal: 10,
   compactMode: false,
   showPronunciation: true,
+  activeLesson: 1,
 };
 
 const DEFAULT_FLASHCARDS = {

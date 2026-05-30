@@ -8,6 +8,7 @@ import {
   exportProgress,
   importProgress,
 } from "../utils/storage.js";
+import lessons from "../data/lessons.js";
 
 const GOALS = [5, 10, 15, 20];
 
@@ -70,6 +71,38 @@ export default function SettingsPage() {
         <h1 className="h1">Settings</h1>
         <p className="muted mt-1">Tune the app to how you like to study.</p>
       </header>
+
+      <Card>
+        <h2 className="h3">Active lesson</h2>
+        <p className="muted text-sm mt-1">
+          Beginner mode focuses practice on one small lesson at a time. Move to the next when you feel comfortable.
+        </p>
+        <div className="mt-3 grid sm:grid-cols-2 gap-2">
+          {lessons.map((l) => {
+            const active = s.activeLesson === l.id;
+            return (
+              <button
+                key={l.id}
+                onClick={() => update({ activeLesson: l.id })}
+                className={`text-left p-3 rounded-xl border transition ${
+                  active
+                    ? "border-brand-500 bg-brand-50/60"
+                    : "border-ink-200 bg-white hover:border-brand-300"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`chip ${active ? "" : "!bg-ink-50 !text-ink-700 !border-ink-100"}`}>
+                    Lesson {l.id}
+                  </span>
+                  {active ? <span className="text-brand-700 text-xs font-semibold">Active</span> : null}
+                </div>
+                <div className="mt-2 font-semibold text-ink-900">{l.title}</div>
+                <div className="text-xs muted mt-0.5">{l.subtitle}</div>
+              </button>
+            );
+          })}
+        </div>
+      </Card>
 
       <Card>
         <h2 className="h3">Daily goal</h2>

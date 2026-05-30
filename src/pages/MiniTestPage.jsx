@@ -2,17 +2,30 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Card from "../components/Card.jsx";
 import Button from "../components/Button.jsx";
 import quizQuestions from "../data/quizQuestions.js";
+import words from "../data/words.js";
 import { answersMatch, shuffle, fillBlank } from "../utils/practice.js";
 import {
   setBestScore,
   getBestScore,
   addMistake,
+  getSettings,
 } from "../utils/storage.js";
+import { getLessonById, quizForLesson } from "../data/lessons.js";
 
 const TEST_SIZE = 10;
 
 export default function MiniTestPage() {
-  const [questions, setQuestions] = useState(() => buildSet());
+  const [settings] = useState(() => getSettings());
+  const lesson = getLessonById(settings.activeLesson);
+  const [onlyLesson, setOnlyLesson] = useState(true);
+
+  const pool = useMemo(() => {
+    if (!onlyLesson) return quizQuestions;
+    const p = quizForLesson(quizQuestions, lesson, words);
+    return p.length >= 4 ? p : quizQuestions;
+  }, [onlyLesson, lesson]);
+
+  const [questions, setQuestions] = useState(() => buildSet(pool));
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState([]); // [{ ok, given }]
   const [typed, setTyped] = useState("");
@@ -74,7 +87,7 @@ export default function MiniTestPage() {
   }
 
   function restart() {
-    setQuestions(buildSet());
+    setQuestions(buildSet(pool));
     setI(0);
     setAnswers([]);
     setTyped("");
@@ -82,6 +95,18 @@ export default function MiniTestPage() {
     setFeedback(null);
     setFinished(false);
   }
+
+  // When the lesson scope changes (toggle), start a fresh test from the new pool.
+  useEffect(() => {
+    setQuestions(buildSet(pool));
+    setI(0);
+    setAnswers([]);
+    setTyped("");
+    setPicked(null);
+    setFeedback(null);
+    setFinished(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pool]);
 
   if (finished) {
     const score = answers.filter((a) => a.ok).length;
@@ -104,6 +129,19 @@ export default function MiniTestPage() {
         </div>
         <div className="text-sm muted">Best: <span className="font-semibold text-ink-800">{best}/{TEST_SIZE}</span></div>
       </header>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        <label className="flex items-center gap-2 text-sm muted cursor-pointer">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500"
+            checked={onlyLesson}
+            onChange={(e) => setOnlyLesson(e.target.checked)}
+          />
+          Test only current lesson · <span className="chip-muted">L{lesson.id}: {lesson.title}</span>
+        </label>
+        <span className="text-xs muted">{pool.length} questions in pool</span>
+      </div>
 
       <div className="h-2 w-full rounded-full bg-ink-100 overflow-hidden">
         <div
@@ -243,8 +281,9 @@ function FinishScreen({ score, total, best, onRestart }) {
   );
 }
 
-function buildSet() {
-  return shuffle(quizQuestions).slice(0, TEST_SIZE);
+function buildSet(pool) {
+  const source = pool && pool.length >= 4 ? pool : quizQuestions;
+  return shuffle(source).slice(0, TEST_SIZE);
 }
 
 function labelType(t) {
