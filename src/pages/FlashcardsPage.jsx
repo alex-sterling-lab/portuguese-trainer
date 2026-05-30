@@ -20,16 +20,19 @@ export default function FlashcardsPage() {
 
   // Deck: word cards + verb cards. Verb cards go first so beginners encounter
   // useful conjugated forms ("eu tenho") rather than bare infinitives.
+  // We strip "Useful verbs" word entries from the vocab side — they overlap with the
+  // verb cards and would otherwise show up as confusing infinitive-only flashcards.
   const deck = useMemo(() => {
+    const nonVerbWords = words.filter((w) => w.category !== "Useful verbs");
     if (onlyLesson) {
-      const lWords = wordsForLesson(words, lesson).map(wordToCard);
+      const lWords = wordsForLesson(nonVerbWords, lesson).map(wordToCard);
       const lVerbs = verbsForLesson(verbs, lesson).map(verbToCard);
       const combined = [...lVerbs, ...lWords];
       return combined.length > 0
         ? combined
-        : [...verbs.map(verbToCard), ...words.map(wordToCard)];
+        : [...verbs.map(verbToCard), ...nonVerbWords.map(wordToCard)];
     }
-    return [...verbs.map(verbToCard), ...words.map(wordToCard)];
+    return [...verbs.map(verbToCard), ...nonVerbWords.map(wordToCard)];
   }, [onlyLesson, lesson]);
 
   const [stats, setStats] = useState(() => getFlashcardStats());
@@ -53,6 +56,9 @@ export default function FlashcardsPage() {
     if (card.type === "word") {
       const numericId = Number(String(card.id).replace("word-", ""));
       if (Number.isFinite(numericId)) addMistake({ kind: "flash", wordId: numericId });
+    } else if (card.type === "verb") {
+      const verbId = String(card.id).replace("verb-", "");
+      if (verbId) addMistake({ kind: "flash", verbId });
     }
     next();
   }
@@ -189,13 +195,16 @@ function WordCardBack({ card }) {
 function VerbCardFront({ card }) {
   return (
     <div className="card h-full flex flex-col items-center justify-center text-center p-6">
-      <span className="chip-muted">{card.category}</span>
+      <span className="chip-muted">Useful verb</span>
       <h2 className="mt-3 text-5xl sm:text-6xl font-semibold text-ink-900">
         {card.infinitive}
       </h2>
       <div className="mt-2 text-lg text-ink-700">{card.english}</div>
-      <div className="mt-4 text-xs muted italic">infinitive form</div>
-      <div className="mt-6 text-xs muted">Tap or press space to flip</div>
+      <div className="mt-3 text-xs muted italic">infinitive form</div>
+      <div className="mt-3 px-4 max-w-xs text-[12px] text-ink-600 leading-relaxed">
+        This is the base form, not the "I" form. Flip to see how it changes.
+      </div>
+      <div className="mt-4 text-xs muted">Tap or press space to flip</div>
     </div>
   );
 }
@@ -204,7 +213,7 @@ function VerbCardBack({ card }) {
   return (
     <div className="card h-full flex flex-col items-start text-left p-5 sm:p-6 bg-brand-50/40 overflow-y-auto">
       <div className="flex items-center justify-between w-full">
-        <span className="chip">Useful forms</span>
+        <span className="chip">Useful beginner forms</span>
         <span className="text-xs muted">{card.infinitive} · {card.english}</span>
       </div>
       <div className="mt-3 w-full divide-y divide-brand-100/70">

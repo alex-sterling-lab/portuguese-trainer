@@ -104,6 +104,7 @@ export function addMistake(entry) {
   const idx = list.findIndex(
     (m) => m.kind === entry.kind &&
       (m.wordId ?? null) === (entry.wordId ?? null) &&
+      (m.verbId ?? null) === (entry.verbId ?? null) &&
       (m.promptId ?? null) === (entry.promptId ?? null) &&
       (m.questionId ?? null) === (entry.questionId ?? null)
   );

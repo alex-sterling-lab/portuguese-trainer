@@ -15,11 +15,11 @@ import {
 import { getLessonById } from "../data/lessons.js";
 
 const DAILY_PLAN = [
-  { to: "/words",      label: "Learn 10 new words",  hint: "Vocabulary" },
-  { to: "/verbs",      label: "Practice 5 verbs",     hint: "Verb trainer" },
-  { to: "/flashcards", label: "Do 10 flashcards",     hint: "Recall practice" },
-  { to: "/mistakes",   label: "Repeat your mistakes", hint: "Spaced review" },
-  { to: "/test",       label: "Take a mini test",     hint: "10 questions" },
+  { to: "/words",      label: "Review current lesson words",  hint: "Vocabulary" },
+  { to: "/verbs",      label: "Practice current lesson verbs", hint: "Verb trainer" },
+  { to: "/flashcards", label: "Do current lesson flashcards",  hint: "Recall practice" },
+  { to: "/mistakes",   label: "Repeat your mistakes",          hint: "Spaced review" },
+  { to: "/test",       label: "Take current lesson mini test", hint: "Mixed questions" },
 ];
 
 const QUICK = [

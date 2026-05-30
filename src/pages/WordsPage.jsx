@@ -16,7 +16,7 @@ export default function WordsPage() {
   const [onlyUnlearned, setOnlyUnlearned] = useState(false);
   const [settings] = useState(() => getSettings());
   const lesson = getLessonById(settings.activeLesson);
-  const [onlyLesson, setOnlyLesson] = useState(false);
+  const [onlyLesson, setOnlyLesson] = useState(true);
 
   const lessonWordSet = useMemo(() => {
     return new Set(wordsForLesson(words, lesson).map((w) => w.id));

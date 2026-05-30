@@ -21,6 +21,7 @@ export default function MistakesPage() {
     setList(removeMistake((x) =>
       x.kind === m.kind &&
       (x.wordId ?? null) === (m.wordId ?? null) &&
+      (x.verbId ?? null) === (m.verbId ?? null) &&
       (x.promptId ?? null) === (m.promptId ?? null) &&
       (x.questionId ?? null) === (m.questionId ?? null)
     ));
@@ -86,15 +87,19 @@ function MistakeCard({ m, wordMap, verbMap, onRemove }) {
   let body = null;
   let answer = m.correctAnswer;
   let kind = m.kind;
+  let missing = false;
 
   if (m.kind === "vocab") {
     const w = wordMap[m.wordId];
-    title = w ? w.portuguese : "Word";
-    answer = w?.english || m.correctAnswer;
-    body = w ? <p className="muted text-sm">{w.examplePt} — <em>{w.exampleEn}</em></p> : null;
+    if (!w) { missing = true; }
+    else {
+      title = w.portuguese;
+      answer = w.english || m.correctAnswer;
+      body = <p className="muted text-sm">{w.examplePt} — <em>{w.exampleEn}</em></p>;
+    }
   } else if (m.kind === "verb") {
     const v = verbMap[m.verb];
-    title = `${m.sentence}`;
+    title = m.sentence;
     body = (
       <p className="muted text-sm">
         Verb <span className="font-mono">{m.verb}</span>{" "}
@@ -104,10 +109,66 @@ function MistakeCard({ m, wordMap, verbMap, onRemove }) {
   } else if (m.kind === "quiz") {
     title = m.question;
   } else if (m.kind === "flash") {
-    const w = wordMap[m.wordId];
-    title = w ? w.portuguese : "Word";
-    answer = w?.english || "";
-    body = w ? <p className="muted text-sm">{w.examplePt} — <em>{w.exampleEn}</em></p> : null;
+    if (m.verbId) {
+      const v = verbMap[m.verbId];
+      if (!v) { missing = true; }
+      else {
+        title = v.infinitive;
+        answer = v.english;
+        body = (
+          <div className="mt-1 space-y-1.5">
+            <div className="text-sm muted">
+              Useful forms:&nbsp;
+              <span className="font-medium text-ink-800">
+                eu {v.forms.eu}
+              </span>
+              {" · "}
+              <span className="font-medium text-ink-800">você {v.forms["você"]}</span>
+              {" · "}
+              <span className="font-medium text-ink-800">a gente {v.forms["a gente"]}</span>
+              {" · "}
+              <span className="font-medium text-ink-800">nós {v.forms["nós"]}</span>
+            </div>
+            {v.intro ? <p className="text-xs muted">{v.intro}</p> : null}
+          </div>
+        );
+      }
+    } else {
+      const w = wordMap[m.wordId];
+      if (!w) { missing = true; }
+      else {
+        title = w.portuguese;
+        answer = w.english || "";
+        body = <p className="muted text-sm">{w.examplePt} — <em>{w.exampleEn}</em></p>;
+      }
+    }
+  }
+
+  if (missing) {
+    return (
+      <article className="card p-4 opacity-80">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <span className="chip-muted">{labelKind(kind)}</span>
+            <h3 className="h3 mt-2">Item not found</h3>
+            <p className="muted text-sm mt-1">
+              It may have been removed from the deck.
+            </p>
+            <div className="mt-2 text-xs muted">
+              Missed {m.count}× · last on {formatDate(m.lastAt || m.addedAt)}
+            </div>
+          </div>
+          <button
+            onClick={onRemove}
+            className="text-ink-400 hover:text-rose-600 text-sm"
+            title="Remove from mistakes"
+            aria-label="Remove"
+          >
+            ✕
+          </button>
+        </div>
+      </article>
+    );
   }
 
   return (

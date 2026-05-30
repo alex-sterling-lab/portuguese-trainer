@@ -316,6 +316,8 @@ export const practicePrompts = [
     translation: "Are you a student?" },
   { id: 115, tag: "lesson2", sentence: "Eu não ___ legal hoje.", verb: "estar", person: "eu", answer: "estou",
     translation: "I'm not feeling great today." },
+  { id: 116, tag: "lesson2", sentence: "Você ___ em casa?", verb: "estar", person: "você", answer: "está",
+    translation: "Are you at home?" },
 
   // ----- Existing practice mix (lessons 3–5 covered by focusVerbs filter) -----
   { id: 1, sentence: "Eu ___ café.", verb: "beber", person: "eu", answer: "bebo",

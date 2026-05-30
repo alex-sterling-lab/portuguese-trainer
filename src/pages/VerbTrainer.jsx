@@ -254,6 +254,26 @@ function renderSentence(sentence, userAnswer, feedback) {
   );
 }
 
+// Beginner-friendly per-(verb, person) explanation.
+// Specific blurbs override the generic one so the most common patterns read naturally.
+const SPECIFIC = {
+  "ser|eu":      "ser = to be (identity). With eu, use sou.",
+  "ser|você":    "ser = to be (identity). With você, use é.",
+  "ser|a gente": "a gente = we (informal) — same verb form as ele/ela/você. ser + a gente = é.",
+  "estar|eu":    "estar = to be (location or temporary state). With eu, use estou.",
+  "estar|você":  "estar = to be (location or temporary state). With você, use está.",
+  "estar|a gente": "a gente = we (informal). estar + a gente = está (same form as você).",
+  "ter|eu":      "ter = to have. With eu, use tenho.",
+  "ter|você":    "ter = to have. With você, use tem.",
+  "ter|a gente": "a gente = we (informal). ter + a gente = tem (same form as você).",
+};
+
 function buildExplanation(verb, prompt) {
-  return `For "${verb.infinitive}" (${verb.english}), the form for "${prompt.person}" is "${verb.forms[prompt.person]}".`;
+  const key = `${verb.id}|${prompt.person}`;
+  if (SPECIFIC[key]) return SPECIFIC[key];
+  const form = verb.forms[prompt.person];
+  if (prompt.person === "a gente") {
+    return `a gente means we (informal) and uses the same form as você / ele / ela. ${verb.infinitive} + a gente = ${form}.`;
+  }
+  return `${verb.infinitive} = ${verb.english}. With ${prompt.person}, use ${form}.`;
 }

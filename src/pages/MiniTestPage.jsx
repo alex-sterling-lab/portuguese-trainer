@@ -21,8 +21,7 @@ export default function MiniTestPage() {
 
   const pool = useMemo(() => {
     if (!onlyLesson) return quizQuestions;
-    const p = quizForLesson(quizQuestions, lesson, words);
-    return p.length >= 4 ? p : quizQuestions;
+    return quizForLesson(quizQuestions, lesson, words);
   }, [onlyLesson, lesson]);
 
   const [questions, setQuestions] = useState(() => buildSet(pool));
@@ -120,36 +119,72 @@ export default function MiniTestPage() {
     );
   }
 
+  const filterControls = (
+    <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+      <label className="flex items-center gap-2 text-sm muted cursor-pointer">
+        <input
+          type="checkbox"
+          className="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500"
+          checked={onlyLesson}
+          onChange={(e) => setOnlyLesson(e.target.checked)}
+        />
+        Test only current lesson · <span className="chip-muted">L{lesson.id}: {lesson.title}</span>
+      </label>
+      <span className="text-xs muted">
+        {onlyLesson
+          ? `${pool.length} current lesson question${pool.length === 1 ? "" : "s"}`
+          : `${pool.length} questions in pool`}
+      </span>
+    </div>
+  );
+
+  if (questions.length === 0) {
+    return (
+      <div className="space-y-5">
+        <header className="flex items-end justify-between gap-3">
+          <div>
+            <h1 className="h1">Mini Test</h1>
+            <p className="muted mt-1">No questions available for this lesson yet.</p>
+          </div>
+        </header>
+        {filterControls}
+        <Card className="text-center py-12">
+          <div className="text-3xl">🌱</div>
+          <h2 className="h2 mt-3">This lesson has no questions yet</h2>
+          <p className="muted mt-2 max-w-md mx-auto">
+            Turn off "Test only current lesson" to take a test from the full question pool,
+            or switch lessons in Settings.
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
+  const totalQ = questions.length;
+  const isShort = onlyLesson && pool.length < TEST_SIZE;
+
   return (
     <div className="space-y-5">
       <header className="flex items-end justify-between gap-3">
         <div>
           <h1 className="h1">Mini Test</h1>
-          <p className="muted mt-1">{TEST_SIZE} mixed questions. Take your time.</p>
+          <p className="muted mt-1">
+            {totalQ} mixed question{totalQ === 1 ? "" : "s"}.
+            {isShort ? " (Lesson is short — using all available.)" : ""} Take your time.
+          </p>
         </div>
         <div className="text-sm muted">Best: <span className="font-semibold text-ink-800">{best}/{TEST_SIZE}</span></div>
       </header>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-        <label className="flex items-center gap-2 text-sm muted cursor-pointer">
-          <input
-            type="checkbox"
-            className="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500"
-            checked={onlyLesson}
-            onChange={(e) => setOnlyLesson(e.target.checked)}
-          />
-          Test only current lesson · <span className="chip-muted">L{lesson.id}: {lesson.title}</span>
-        </label>
-        <span className="text-xs muted">{pool.length} questions in pool</span>
-      </div>
+      {filterControls}
 
       <div className="h-2 w-full rounded-full bg-ink-100 overflow-hidden">
         <div
           className="h-full bg-brand-500 transition-all"
-          style={{ width: `${((i) / questions.length) * 100}%` }}
+          style={{ width: `${((i) / totalQ) * 100}%` }}
         />
       </div>
-      <div className="text-xs muted -mt-3">Question {i + 1} of {questions.length}</div>
+      <div className="text-xs muted -mt-3">Question {i + 1} of {totalQ}</div>
 
       <Card>
         <div className="flex items-center gap-2 mb-3">
@@ -282,8 +317,8 @@ function FinishScreen({ score, total, best, onRestart }) {
 }
 
 function buildSet(pool) {
-  const source = pool && pool.length >= 4 ? pool : quizQuestions;
-  return shuffle(source).slice(0, TEST_SIZE);
+  if (!pool || pool.length === 0) return [];
+  return shuffle(pool).slice(0, Math.min(TEST_SIZE, pool.length));
 }
 
 function labelType(t) {
