@@ -62,6 +62,10 @@ export default function VerbTrainer() {
   function check(e) {
     e?.preventDefault();
     if (feedback) return next();
+    // Guard: empty input shouldn't count as a wrong answer.
+    // This happens when the user hits Enter on the freshly-focused empty input
+    // after moving to the next prompt.
+    if (!userAnswer.trim()) return;
     const ok = answersMatch(userAnswer, prompt.answer);
     const newStats = recordVerbResult(ok);
     setStats(newStats);
@@ -158,7 +162,7 @@ export default function VerbTrainer() {
           {feedback ? (
             <Button type="button" onClick={next}>Next →</Button>
           ) : (
-            <Button type="submit">Check</Button>
+            <Button type="submit" disabled={!userAnswer.trim()}>Check</Button>
           )}
         </form>
 
