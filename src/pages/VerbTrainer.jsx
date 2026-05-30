@@ -8,8 +8,9 @@ import {
   recordVerbResult,
   addMistake,
   getSettings,
+  saveSettings,
 } from "../utils/storage.js";
-import { getLessonById, promptsForLesson } from "../data/lessons.js";
+import lessons, { getLessonById, promptsForLesson } from "../data/lessons.js";
 
 const PERSON_LABELS = {
   eu: "eu (I)",
@@ -36,8 +37,9 @@ function pickDue(pool, seen, excludeId) {
 
 export default function VerbTrainer() {
   const verbMap = useMemo(() => Object.fromEntries(verbs.map((v) => [v.id, v])), []);
-  const [settings] = useState(() => getSettings());
-  const lesson = getLessonById(settings.activeLesson);
+  const [activeLessonId, setActiveLessonId] = useState(() => getSettings().activeLesson || 1);
+  const lesson = getLessonById(activeLessonId);
+  const nextLesson = lessons.find((l) => l.id === activeLessonId + 1) || null;
   const [onlyLesson, setOnlyLesson] = useState(true);
 
   const activePool = useMemo(() => {
@@ -56,10 +58,16 @@ export default function VerbTrainer() {
   const [feedback, setFeedback] = useState(null); // { ok, correct, explanation }
   const [showHint, setShowHint] = useState(false);
   const inputRef = useRef(null);
+  const nextBtnRef = useRef(null);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, [prompt]);
+
+  // After an answer, focus the "Next →" button so pressing Enter advances.
+  useEffect(() => {
+    if (feedback) nextBtnRef.current?.focus();
+  }, [feedback]);
 
   // Lesson filter toggled → reset the round entirely.
   useEffect(() => {
@@ -138,6 +146,15 @@ export default function VerbTrainer() {
     setShowHint(false);
   }
 
+  function goToLesson(id) {
+    const next = getLessonById(id);
+    if (!next) return;
+    setActiveLessonId(next.id);
+    saveSettings({ activeLesson: next.id });
+    // The activePool useMemo depends on `lesson` — which we derive from
+    // activeLessonId — so the round-reset useEffect will fire automatically.
+  }
+
   const accuracy = stats.correct + stats.wrong > 0
     ? Math.round((stats.correct / (stats.correct + stats.wrong)) * 100)
     : 0;
@@ -191,16 +208,45 @@ export default function VerbTrainer() {
           <div className="text-3xl">🌿</div>
           <h2 className="h2 mt-3">Round complete</h2>
           <p className="muted mt-2 max-w-md mx-auto">
-            You answered {totalThisRound} prompt{totalThisRound === 1 ? "" : "s"} this round —
-            {" "}<span className="font-semibold text-ink-800">
+            You answered {totalThisRound} prompt{totalThisRound === 1 ? "" : "s"} this round —{" "}
+            <span className="font-semibold text-ink-800">
               {roundCorrect}/{totalThisRound} correct
               {totalThisRound > 0 ? ` (${Math.round((roundCorrect / totalThisRound) * 100)}%)` : ""}
             </span>.
           </p>
+
+          {nextLesson ? (
+            <div className="mt-5 inline-flex flex-col items-center gap-1 p-4 rounded-2xl bg-brand-50/70 border border-brand-100 max-w-md">
+              <div className="text-xs uppercase tracking-wide text-brand-700/80 font-semibold">
+                Next up
+              </div>
+              <div className="text-lg font-semibold text-ink-900">
+                Lesson {nextLesson.id}: {nextLesson.title}
+              </div>
+              <div className="text-sm muted">{nextLesson.subtitle}</div>
+            </div>
+          ) : (
+            <div className="mt-5 inline-flex flex-col items-center gap-1 p-4 rounded-2xl bg-sand-100 border border-sand-200 max-w-md">
+              <div className="text-sm text-ink-700">
+                You finished the last beginner lesson. Repeat it, switch off the lesson filter
+                for mixed practice, or review your mistakes.
+              </div>
+            </div>
+          )}
+
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <Button onClick={newRound}>Start a new round →</Button>
-            <a className="btn-secondary" href="#/flashcards">Switch to flashcards</a>
-            <a className="btn-secondary" href="#/mistakes">Review mistakes</a>
+            {nextLesson ? (
+              <Button onClick={() => goToLesson(nextLesson.id)}>
+                Continue to Lesson {nextLesson.id} →
+              </Button>
+            ) : (
+              <Button onClick={() => { setOnlyLesson(false); newRound(); }}>
+                Practice everything (mixed) →
+              </Button>
+            )}
+            <Button variant="secondary" onClick={newRound}>Repeat this lesson</Button>
+            <a className="btn-ghost" href="#/flashcards">Flashcards</a>
+            <a className="btn-ghost" href="#/mistakes">Mistakes</a>
           </div>
         </Card>
       ) : !prompt || !verb ? (
@@ -241,7 +287,13 @@ export default function VerbTrainer() {
             spellCheck={false}
           />
           {feedback ? (
-            <Button type="button" onClick={next}>Next →</Button>
+            <Button
+              type="submit"
+              onClick={next}
+              ref={nextBtnRef}
+            >
+              Next →
+            </Button>
           ) : (
             <Button type="submit" disabled={!userAnswer.trim()}>Check</Button>
           )}
