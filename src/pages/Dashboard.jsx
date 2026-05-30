@@ -7,6 +7,7 @@ import verbs from "../data/verbs.js";
 import {
   getLearnedWords,
   getPracticedVerbs,
+  getPracticedWords,
   getFlashcardStats,
   getMistakes,
   getBestScore,
@@ -118,18 +119,18 @@ export default function Dashboard() {
           accent="brand"
         />
         <ProgressCard
+          label="Word exercises"
+          value={snap.wordStats.correct + snap.wordStats.wrong}
+          hint={accuracyText(snap.wordStats)}
+          icon="Aa"
+          accent="ink"
+        />
+        <ProgressCard
           label="Verbs practiced"
           value={snap.verbStats.correct + snap.verbStats.wrong}
           hint={accuracyText(snap.verbStats)}
           icon="≡"
           accent="blue"
-        />
-        <ProgressCard
-          label="Flashcards seen"
-          value={snap.flashStats.seen}
-          hint={`${snap.flashStats.remembered.length} remembered`}
-          icon="▭"
-          accent="ink"
         />
         <ProgressCard
           label="Mistakes to repeat"
@@ -220,6 +221,7 @@ function collectStats() {
   return {
     learnedCount: getLearnedWords().length,
     verbStats: getPracticedVerbs(),
+    wordStats: getPracticedWords(),
     flashStats: getFlashcardStats(),
     mistakes: getMistakes(),
     bestScore: getBestScore(),

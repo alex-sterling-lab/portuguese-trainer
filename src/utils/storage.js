@@ -3,6 +3,7 @@
 const KEYS = {
   learnedWords: "portuguese_trainer_learned_words",
   practicedVerbs: "portuguese_trainer_practiced_verbs",
+  practicedWords: "portuguese_trainer_practiced_words",
   flashcards: "portuguese_trainer_flashcards",
   mistakes: "portuguese_trainer_mistakes",
   bestScore: "portuguese_trainer_best_score",
@@ -70,6 +71,18 @@ export function recordVerbResult(isCorrect) {
   if (isCorrect) stats.correct += 1;
   else stats.wrong += 1;
   safeWrite(KEYS.practicedVerbs, stats);
+  return stats;
+}
+
+// ---------- Practiced words ----------
+export function getPracticedWords() {
+  return { ...DEFAULT_PRACTICED_VERBS, ...safeRead(KEYS.practicedWords, {}) };
+}
+export function recordWordResult(isCorrect) {
+  const stats = getPracticedWords();
+  if (isCorrect) stats.correct += 1;
+  else stats.wrong += 1;
+  safeWrite(KEYS.practicedWords, stats);
   return stats;
 }
 
@@ -166,10 +179,11 @@ export function resetAllProgress() {
 
 export function exportProgress() {
   return {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     learnedWords: getLearnedWords(),
     practicedVerbs: getPracticedVerbs(),
+    practicedWords: getPracticedWords(),
     flashcards: getFlashcardStats(),
     mistakes: getMistakes(),
     bestScore: getBestScore(),
@@ -181,6 +195,7 @@ export function importProgress(data) {
   if (!data || typeof data !== "object") throw new Error("Invalid file.");
   if (Array.isArray(data.learnedWords)) safeWrite(KEYS.learnedWords, data.learnedWords);
   if (data.practicedVerbs) safeWrite(KEYS.practicedVerbs, data.practicedVerbs);
+  if (data.practicedWords) safeWrite(KEYS.practicedWords, data.practicedWords);
   if (data.flashcards) safeWrite(KEYS.flashcards, data.flashcards);
   if (Array.isArray(data.mistakes)) safeWrite(KEYS.mistakes, data.mistakes);
   if (typeof data.bestScore === "number") safeWrite(KEYS.bestScore, data.bestScore);
