@@ -15,8 +15,16 @@ const lessons = [
     summary: "Three essential verbs and three pronouns. Build your first real sentences.",
     focusVerbs: ["ser", "estar", "ter"],
     pronouns: ["eu", "você", "a gente"],
-    // Vocabulary used in this lesson's example sentences.
-    wordIds: [20, 22, 220, 95, 41, 221, 222, 223, 224, 8, 9],
+    // Vocabulary used in this lesson's example sentences + essential greetings
+    // every absolute beginner needs from day one.
+    wordIds: [
+      // greetings / basic phrases
+      1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+      // pronouns
+      20, 22, 220,
+      // sentence-building words
+      95, 41, 221, 222, 223, 224, 225,
+    ],
     examples: [
       { pt: "Eu sou estudante.", en: "I am a student." },
       { pt: "Eu estou em casa.", en: "I am at home." },
@@ -31,7 +39,11 @@ const lessons = [
     summary: "Same three verbs — now say what isn't true and how to ask.",
     focusVerbs: ["ser", "estar", "ter"],
     pronouns: ["eu", "você", "a gente"],
-    wordIds: [20, 22, 220, 95, 41, 221, 222, 223, 224, 8, 9],
+    wordIds: [
+      1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+      20, 22, 220,
+      95, 41, 221, 222, 223, 224, 225,
+    ],
     examples: [
       { pt: "Eu não estou em casa.", en: "I am not at home." },
       { pt: "Eu não tenho café.", en: "I don't have coffee." },
@@ -45,9 +57,10 @@ const lessons = [
     subtitle: "falar · estudar · morar · trabalhar",
     summary: "One -ar pattern unlocks dozens of useful verbs.",
     focusVerbs: ["falar", "estudar", "morar", "trabalhar"],
-    pronouns: null, // any pronoun
+    // Beginner-friendly pronouns only — vocês/eles/elas come later.
+    pronouns: ["eu", "você", "a gente", "nós", "ele", "ela"],
     wordIds: [
-      20, 22, 220, 25, 26,
+      20, 22, 220, 25,
       75, 76, 77, 95, 60, 62,
       29, 30,
     ],
@@ -63,9 +76,9 @@ const lessons = [
     subtitle: "comer · beber · aprender",
     summary: "The -er pattern — same logic, different ending.",
     focusVerbs: ["comer", "beber", "aprender"],
-    pronouns: null,
+    pronouns: ["eu", "você", "a gente", "nós", "ele", "ela"],
     wordIds: [
-      20, 22, 220, 25, 26,
+      20, 22, 220, 25,
       40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
     ],
     examples: [
@@ -80,11 +93,11 @@ const lessons = [
     subtitle: "ir · querer · poder · fazer",
     summary: "Four irregulars you'll use every day.",
     focusVerbs: ["ir", "querer", "poder", "fazer"],
-    pronouns: null,
+    pronouns: ["eu", "você", "a gente", "nós", "ele", "ela"],
     wordIds: [
-      20, 22, 220, 25, 26,
+      20, 22, 220, 25,
       95, 75, 86, 87, 85, 78, 79,
-      114, 115, 117,
+      114, 115, 117, 225,
     ],
     examples: [
       { pt: "Eu vou para casa.", en: "I'm going home." },

@@ -23,6 +23,17 @@ const PERSON_LABELS = {
   elas: "elas (they f.)",
 };
 
+// Each prompt is shown at most this many times per round.
+const REPEAT_PER_ROUND = 2;
+
+function pickDue(pool, seen, excludeId) {
+  const due = pool.filter((p) => (seen[p.id] || 0) < REPEAT_PER_ROUND);
+  if (due.length === 0) return null;
+  const others = due.filter((p) => p.id !== excludeId);
+  const candidates = others.length > 0 ? others : due;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
 export default function VerbTrainer() {
   const verbMap = useMemo(() => Object.fromEntries(verbs.map((v) => [v.id, v])), []);
   const [settings] = useState(() => getSettings());
@@ -36,7 +47,11 @@ export default function VerbTrainer() {
   }, [onlyLesson, lesson]);
 
   const [stats, setStats] = useState(() => getPracticedVerbs());
-  const [prompt, setPrompt] = useState(() => pickRandom(activePool));
+  // Round-local state: how many times each prompt has been shown this round,
+  // and how many of those attempts were correct.
+  const [seen, setSeen] = useState({});
+  const [roundCorrect, setRoundCorrect] = useState(0);
+  const [prompt, setPrompt] = useState(() => pickDue(activePool, {}, null));
   const [userAnswer, setUserAnswer] = useState("");
   const [feedback, setFeedback] = useState(null); // { ok, correct, explanation }
   const [showHint, setShowHint] = useState(false);
@@ -46,29 +61,35 @@ export default function VerbTrainer() {
     inputRef.current?.focus();
   }, [prompt]);
 
-  // When the user toggles the lesson filter, switch to a prompt from the new pool.
+  // Lesson filter toggled → reset the round entirely.
   useEffect(() => {
-    if (!activePool.some((p) => p.id === prompt.id)) {
-      setPrompt(pickRandom(activePool));
-      setUserAnswer("");
-      setFeedback(null);
-      setShowHint(false);
-    }
+    setSeen({});
+    setRoundCorrect(0);
+    setPrompt(pickDue(activePool, {}, null));
+    setUserAnswer("");
+    setFeedback(null);
+    setShowHint(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePool]);
 
-  const verb = verbMap[prompt.verb];
+  const verb = prompt ? verbMap[prompt.verb] : null;
+
+  // Round progress.
+  const totalThisRound = activePool.length * REPEAT_PER_ROUND;
+  const doneThisRound = Object.values(seen).reduce((a, b) => a + b, 0);
+  const roundComplete = prompt == null && totalThisRound > 0;
+  const pct = totalThisRound > 0 ? Math.round((doneThisRound / totalThisRound) * 100) : 0;
 
   function check(e) {
     e?.preventDefault();
     if (feedback) return next();
-    // Guard: empty input shouldn't count as a wrong answer.
-    // This happens when the user hits Enter on the freshly-focused empty input
-    // after moving to the next prompt.
     if (!userAnswer.trim()) return;
+    if (!prompt) return;
     const ok = answersMatch(userAnswer, prompt.answer);
     const newStats = recordVerbResult(ok);
     setStats(newStats);
+    setSeen((s) => ({ ...s, [prompt.id]: (s[prompt.id] || 0) + 1 }));
+    if (ok) setRoundCorrect((c) => c + 1);
     setFeedback({
       ok,
       correct: prompt.answer,
@@ -88,14 +109,30 @@ export default function VerbTrainer() {
   }
 
   function next() {
-    setPrompt(pickRandom(activePool, [prompt.id]));
+    // Use the just-updated `seen` from current state.
+    const newSeen = feedback
+      ? seen // already incremented when check() ran
+      : seen;
+    const nextPrompt = pickDue(activePool, newSeen, prompt?.id);
+    setPrompt(nextPrompt); // null → round complete screen
     setUserAnswer("");
     setFeedback(null);
     setShowHint(false);
   }
 
   function skip() {
-    setPrompt(pickRandom(activePool, [prompt.id]));
+    // Skipping does NOT consume an attempt — the prompt can still come back.
+    const nextPrompt = pickDue(activePool, seen, prompt?.id);
+    setPrompt(nextPrompt);
+    setUserAnswer("");
+    setFeedback(null);
+    setShowHint(false);
+  }
+
+  function newRound() {
+    setSeen({});
+    setRoundCorrect(0);
+    setPrompt(pickDue(activePool, {}, null));
     setUserAnswer("");
     setFeedback(null);
     setShowHint(false);
@@ -132,6 +169,50 @@ export default function VerbTrainer() {
         <span className="text-xs muted">{activePool.length} prompts in pool</span>
       </div>
 
+      {/* Round progress bar */}
+      <div>
+        <div className="flex items-center justify-between text-xs muted mb-1.5">
+          <span>
+            Round progress · {doneThisRound} of {totalThisRound} answers
+            <span className="hidden sm:inline"> (each prompt ×{REPEAT_PER_ROUND})</span>
+          </span>
+          <span>{pct}%</span>
+        </div>
+        <div className="h-2 w-full rounded-full bg-ink-100 overflow-hidden">
+          <div
+            className="h-full bg-brand-500 transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+
+      {roundComplete ? (
+        <Card className="text-center py-10">
+          <div className="text-3xl">🌿</div>
+          <h2 className="h2 mt-3">Round complete</h2>
+          <p className="muted mt-2 max-w-md mx-auto">
+            You answered {totalThisRound} prompt{totalThisRound === 1 ? "" : "s"} this round —
+            {" "}<span className="font-semibold text-ink-800">
+              {roundCorrect}/{totalThisRound} correct
+              {totalThisRound > 0 ? ` (${Math.round((roundCorrect / totalThisRound) * 100)}%)` : ""}
+            </span>.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <Button onClick={newRound}>Start a new round →</Button>
+            <a className="btn-secondary" href="#/flashcards">Switch to flashcards</a>
+            <a className="btn-secondary" href="#/mistakes">Review mistakes</a>
+          </div>
+        </Card>
+      ) : !prompt || !verb ? (
+        <Card className="text-center py-10">
+          <h2 className="h2">No prompts available</h2>
+          <p className="muted mt-2">
+            This lesson has no practice prompts yet. Turn off "Practice only current lesson"
+            or pick another lesson in Settings.
+          </p>
+        </Card>
+      ) : (
+      <>
       <Card>
         <div className="flex items-center justify-between mb-3">
           <div className="flex flex-wrap gap-2">
@@ -232,6 +313,8 @@ export default function VerbTrainer() {
           </p>
         ) : null}
       </Card>
+      </>
+      )}
     </div>
   );
 }
